@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SmartRooms</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: control-room landing page — a camera-feed hero, then calm sections set on a blue-tinted paper ground */
+:root {
+  --bg: #f3f5f8;
+  --surface: #ffffff;
+  --ink: #142033;
+  --muted: #56627a;
+  --line: #d9dfe8;
+  --accent: #e0820b;      /* alert amber */
+  --accent-ink: #1b1204;
+  --signal: #127a86;      /* teal for "all clear" */
+  --feed: #0f1826;
+  --feed-ink: #cfe3ea;
+  --font-display: "Chakra Petch", "Segoe UI", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1522; --surface: #162033; --ink: #e6ecf4; --muted: #9aa7bd; --line: #26334a;
+    --accent: #f29a2e; --accent-ink: #1b1204; --signal: #3fb6c2; --feed: #070c15; --feed-ink: #cfe3ea;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1522; --surface: #162033; --ink: #e6ecf4; --muted: #9aa7bd; --line: #26334a;
+  --accent: #f29a2e; --accent-ink: #1b1204; --signal: #3fb6c2; --feed: #070c15; --feed-ink: #cfe3ea;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); font-size: 1rem; line-height: 1.6;
+}
+.wrap {
+  max-width: 1080px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+h1, h2, h3 { font-family: var(--font-display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2.1rem, 5vw, 3.4rem); font-weight: 700; letter-spacing: -0.01em; }
+h2 { font-size: clamp(1.5rem, 3vw, 2.1rem); font-weight: 600; }
+h3 { font-size: 1.15rem; font-weight: 600; }
+p { margin: 0; }
+.eyebrow {
+  font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--muted);
+}
+a:focus-visible, .btn:focus-visible, button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+
+/* Nav */
+nav .wrap { display: flex; justify-content: space-between; align-items: center; padding-block: 18px; gap: 16px; }
+.brand { font-family: var(--font-display); font-weight: 700; font-size: 1.25rem; display: flex; align-items: center; gap: 10px; }
+.brand .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 25%, transparent); }
+.btn {
+  display: inline-block; font-family: var(--font-display); font-weight: 600; font-size: 1rem;
+  padding: 12px 22px; border-radius: 6px; text-decoration: none; border: 2px solid var(--accent);
+  background: var(--accent); color: var(--accent-ink); cursor: pointer;
+}
+.btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+
+/* Hero */
+.hero .wrap { display: grid; grid-template-columns: 1.05fr 1fr; gap: 48px; align-items: center; padding-block: 40px 72px; }
+.hero-copy { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
+.hero-copy .lede { font-size: 1.15rem; color: var(--muted); max-width: 34em; }
+.hero-copy .ctas { display: flex; flex-wrap: wrap; gap: 12px; }
+
+.feed {
+  background: var(--feed); color: var(--feed-ink); border-radius: 10px; padding: 14px;
+  font-family: var(--font-mono); font-size: 0.75rem; max-width: 100%; min-width: 0;
+}
+.feed-top { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; padding-bottom: 10px; }
+.rec { color: #ff6b5b; }
+.screen {
+  position: relative; aspect-ratio: 16 / 10; max-width: 100%; border-radius: 6px; overflow: hidden;
+  background:
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.03) 0 2px, transparent 2px 4px),
+    linear-gradient(160deg, #1c2a40, #0b1220 70%);
+}
+/* simple classroom: desk rows drawn with gradients */
+.desks { position: absolute; inset: 42% 6% 6% 6%; display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(2, 1fr); gap: 10% 8%; }
+.desks span { background: rgba(207,227,234,0.12); border-top: 2px solid rgba(207,227,234,0.25); border-radius: 2px; }
+.board { position: absolute; top: 9%; left: 22%; width: 56%; height: 18%; border: 2px solid rgba(207,227,234,0.22); border-radius: 2px; }
+.box { position: absolute; border: 2px solid; border-radius: 3px; }
+.box b { position: absolute; top: -1.7em; left: -2px; white-space: nowrap; font-weight: 500; padding: 1px 6px; border-radius: 2px; font-size: 0.7rem; }
+.box.alert { border-color: var(--accent); left: 54%; top: 46%; width: 24%; height: 40%; }
+.box.alert b { background: var(--accent); color: var(--accent-ink); }
+.box.ok { border-color: var(--signal); left: 10%; top: 50%; width: 15%; height: 34%; }
+.box.ok b { background: var(--signal); color: #04161a; }
+.feed-bottom { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; padding-top: 10px; color: #8ea3b3; }
+@media (prefers-reduced-motion: no-preference) {
+  .box.alert { animation: pulse 2.4s ease-in-out infinite; }
+  @keyframes pulse { 50% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--accent) 30%, transparent); } }
+}
+
+/* Sections */
+section.band .wrap { padding-block: 64px; display: flex; flex-direction: column; gap: 32px; }
+section.band + section.band .wrap { border-top: 1px solid var(--line); }
+.head { display: flex; flex-direction: column; gap: 10px; max-width: 44em; }
+.head p { color: var(--muted); }
+
+.pitch { width: 100%; max-width: 760px; aspect-ratio: 16 / 9; border-radius: 10px; background: var(--feed); display: block; }
+
+.problems { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+.problems div { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.problems p { color: var(--muted); }
+
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; list-style: none; padding: 0; margin: 0; counter-reset: s; }
+.steps li { counter-increment: s; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 22px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.steps li::before { content: "Step " counter(s); font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+.steps p { color: var(--muted); }
+
+.detects { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0; border-top: 1px solid var(--line); }
+.detects div { display: grid; grid-template-columns: 9.5em 1fr; gap: 16px; padding-block: 18px; border-bottom: 1px solid var(--line); padding-right: 24px; min-width: 0; }
+.detects .tag { font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent); padding-top: 3px; }
+.detects p { color: var(--muted); }
+.detects h3 { margin-bottom: 4px; }
+
+.why { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+.why div { display: flex; flex-direction: column; gap: 8px; padding-left: 16px; border-left: 3px solid var(--signal); min-width: 0; }
+.why p { color: var(--muted); }
+
+.status { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }
+.status-card { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 24px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.status-card ul { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 6px; color: var(--muted); }
+.big { font-family: var(--font-display); font-size: 2.6rem; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+.big small { font-size: 1rem; color: var(--muted); font-weight: 500; }
+.chip { align-self: flex-start; font-family: var(--font-mono); font-size: 0.75rem; padding: 3px 10px; border-radius: 99px; border: 1px solid var(--signal); color: var(--signal); }
+
+.team { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.team div { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.team .role { font-family: var(--font-mono); font-size: 0.8rem; color: var(--muted); }
+
+.cta { background: var(--feed); color: var(--feed-ink); }
+.cta .wrap { padding-block: 64px; display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; align-items: center; }
+.cta h2 { color: #ffffff; }
+.cta p { color: #a9bccb; }
+.contact { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.mail { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.mail code { font-family: var(--font-mono); font-size: 1rem; background: rgba(255,255,255,0.08); padding: 10px 14px; border-radius: 6px; color: #ffffff; user-select: all; overflow-wrap: anywhere; }
+.mail button { font-family: var(--font-display); font-weight: 600; background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 6px; padding: 10px 16px; cursor: pointer; }
+.copied { font-family: var(--font-mono); font-size: 0.8rem; color: #8fd6de; min-height: 1.2em; }
+
+footer .wrap { padding-block: 28px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; color: var(--muted); font-size: 0.9rem; }
+
+@media (max-width: 860px) {
+  .hero .wrap, .status, .cta .wrap { grid-template-columns: 1fr; }
+  .problems, .steps, .why, .team { grid-template-columns: 1fr; }
+  .detects { grid-template-columns: 1fr; }
+  .detects div { padding-right: 0; }
+}
+@media (max-width: 460px) {
+  .detects div { grid-template-columns: 1fr; gap: 4px; }
+}
+</style>
+</head>
+<body style="margin:0">
+
+<nav>
+  <div class="wrap">
+    <div class="brand"><span class="dot" aria-hidden="true"></span>SmartRooms</div>
+    <a class="btn ghost" href="#contact">Book a demo</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-copy">
+      <span class="eyebrow">AI safety monitoring for schools</span>
+      <h1>Your CCTV already sees everything. SmartRooms helps you notice.</h1>
+      <p class="lede">SmartRooms adds AI to the cameras your school already has. It spots bullying, fights, suspicious activity and exam malpractice, and alerts your staff with the video clip as proof.</p>
+      <div class="ctas">
+        <a class="btn" href="#contact">Book a pilot demo</a>
+        <a class="btn ghost" href="#pitch">Watch our 1-minute pitch</a>
+      </div>
+    </div>
+
+    <figure class="feed" aria-label="Illustration of a classroom camera view with an AI alert">
+      <div class="feed-top"><span>CAM 03 · CLASSROOM 7B</span><span class="rec">● REC 10:42:17</span></div>
+      <div class="screen">
+        <div class="board"></div>
+        <div class="desks"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+        <div class="box ok"><b>Normal</b></div>
+        <div class="box alert"><b>Possible bullying</b></div>
+      </div>
+      <figcaption class="feed-bottom"><span>Alert sent to: Principal's office</span><span>Illustration</span></figcaption>
+    </figure>
+  </div>
+</header>
+
+<section class="band" id="pitch">
+  <div class="wrap">
+    <div class="head">
+      <span class="eyebrow">Our pitch</span>
+      <h2>SmartRooms in one minute.</h2>
+    </div>
+    <video class="pitch" controls preload="metadata" playsinline poster="poster.jpg">
+      <source src="pitch.mp4" type="video/mp4">
+      Your browser can't play this video.
+    </video>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap">
+    <div class="head">
+      <span class="eyebrow">The problem</span>
+      <h2>No one can watch every screen all day.</h2>
+    </div>
+    <div class="problems">
+      <div><h3>Bullying goes unnoticed</h3><p>Many incidents happen when no teacher is looking, and victims often don't report them.</p></div>
+      <div><h3>Exams are hard to supervise</h3><p>One invigilator can't see every desk, so copying and malpractice slip through.</p></div>
+      <div><h3>Cameras record, but nobody reviews</h3><p>Footage is checked only after a complaint, when it's already too late to step in.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="how">
+  <div class="wrap">
+    <div class="head">
+      <span class="eyebrow">How it works</span>
+      <h2>Three steps, no new cameras.</h2>
+    </div>
+    <ol class="steps">
+      <li><h3>Connect your cameras</h3><p>SmartRooms works with your school's existing CCTV setup. It's software only.</p></li>
+      <li><h3>AI reviews the footage</h3><p>Computer vision looks for risky behaviour in classrooms, corridors and exam halls.</p></li>
+      <li><h3>Your staff get an alert</h3><p>The right person sees what was flagged, with the key video frames, on a simple dashboard.</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap">
+    <div class="head">
+      <span class="eyebrow">What it detects</span>
+      <h2>Built around real school situations.</h2>
+    </div>
+    <div class="detects">
+      <div><span class="tag">CLASSROOM</span><div><h3>Bullying and fights</h3><p>Flags aggressive behaviour between students early.</p></div></div>
+      <div><span class="tag">EXAM HALL</span><div><h3>Exam malpractice</h3><p>Highlights copying and suspicious movement during tests.</p></div></div>
+      <div><span class="tag">ENTRANCES</span><div><h3>Unauthorised entry</h3><p>Notices people who shouldn't be in an area.</p></div></div>
+      <div><span class="tag">CORRIDORS</span><div><h3>Unattended objects</h3><p>Points out bags or items left behind in common areas.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap">
+    <div class="head">
+      <span class="eyebrow">Why SmartRooms</span>
+      <h2>Made for schools, priced for schools.</h2>
+    </div>
+    <div class="why">
+      <div><h3>Uses what you have</h3><p>No new hardware to buy or install. SmartRooms runs on your current CCTV.</p></div>
+      <div><h3>More than intrusion alerts</h3><p>Most security tools look for theft or break-ins. SmartRooms also catches bullying and exam malpractice.</p></div>
+      <div><h3>Simple subscription</h3><p>One affordable yearly plan instead of a large upfront security contract.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap">
+    <div class="head">
+      <span class="eyebrow">Where we are</span>
+      <h2>An early prototype, tested with educators.</h2>
+    </div>
+    <div class="status">
+      <div class="status-card">
+        <span class="chip">Prototype stage</span>
+        <p>Our current prototype analyses uploaded classroom videos, extracts the important frames and flags bullying, threats and exam malpractice.</p>
+        <div class="big">4 <small>of 5 educators who tried it liked it</small></div>
+      </div>
+      <div class="status-card">
+        <h3>What we're building next</h3>
+        <ul>
+          <li>Better detection accuracy</li>
+          <li>Live connection to CCTV feeds</li>
+          <li>Pilots with partner schools</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap">
+    <div class="head">
+      <span class="eyebrow">The team</span>
+      <h2>Students at IIIT Sri City.</h2>
+    </div>
+    <div class="team">
+      <div><h3>Velaga Giresh Komal</h3><span class="role">Customer validation</span></div>
+      <div><h3>Vempati Nitin</h3><span class="role">Prototype developer</span></div>
+      <div><h3>Thrivikram Teja</h3><span class="role">AI product developer</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="cta" id="contact">
+  <div class="wrap">
+    <div class="head">
+      <span class="eyebrow" style="color:#8ea3b3">Book a demo</span>
+      <h2>See SmartRooms on your own campus footage.</h2>
+      <p>We're looking for a few schools to try a pilot. Write to us and we'll set up a 15-minute demo.</p>
+    </div>
+    <div class="contact">
+      <div class="mail">
+        <code id="email">bharadhwaj.p23@iiits.in</code>
+        <button type="button" id="copy">Copy email</button>
+      </div>
+      <div class="copied" id="copied" aria-live="polite"></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>SmartRooms · Indian Institute of Information Technology, Sri City</span>
+    <span>Making schools safer with AI</span>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('copy').addEventListener('click', function () {
+    var text = document.getElementById('email').textContent;
+    var note = document.getElementById('copied');
+    function fallback() {
+      var r = document.createRange(); r.selectNodeContents(document.getElementById('email'));
+      var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      note.textContent = 'Selected. Press Ctrl+C to copy.';
+    }
+    try {
+      navigator.clipboard.writeText(text).then(function () { note.textContent = 'Copied.'; }, fallback);
+    } catch (e) { fallback(); }
+  });
+</script>
+</body>
+</html>
